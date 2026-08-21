@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DocketPulse — Legal OS for Indian Law Firms</title>
+<meta name="description" content="DocketPulse is the Legal Operations Workspace for Indian law firms — hearings, matters, clients and filings in one docket that never lets a deadline slip.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400;1,8..60,500&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#191715;
+    --bg-elevated:#211E1A;
+    --bg-panel:#221F1B;
+    --bg-dim:#1D1A17;
+    --text:#F3EFE7;
+    --text-soft:#B8B0A2;
+    --text-mute:#847C6E;
+    --accent:#D2A188;
+    --accent-soft:#E6C4AC;
+    --accent-dim:#463A32;
+    --line:rgba(243,239,231,0.11);
+    --line-soft:rgba(243,239,231,0.07);
+    --shadow: 0 26px 64px -28px rgba(0,0,0,0.6);
+    --card-bg:#F4F1EA;
+    --card-bg-alt:#EAE5D8;
+    --card-ink:#1F1D19;
+    --card-ink-soft:#6B675C;
+    --card-ink-mute:#9A9587;
+    --card-line:rgba(31,29,25,0.11);
+    --card-shadow: 0 30px 60px -24px rgba(0,0,0,0.45);
+    --display:'Source Serif 4', serif;
+    --body:'Inter', -apple-system, sans-serif;
+    --mono:'JetBrains Mono', monospace;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:var(--body);
+    color:var(--text);
+    background:
+      radial-gradient(ellipse 900px 500px at 18% -6%, rgba(210,161,136,0.09), transparent 62%),
+      var(--bg);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  img,svg{display:block; max-width:100%;}
+  a{color:inherit; text-decoration:none;}
+  ul{list-style:none;}
+  button{font-family:inherit; cursor:pointer;}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:3px;}
+
+  .wrap{max-width:1180px; margin:0 auto; padding:0 32px;}
+
+  .clause{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:0.06em;
+    color:var(--accent);
+    display:flex;
+    align-items:center;
+    gap:9px;
+  }
+  .clause::before{content:'§';}
+
+  /* ---------- NAV ---------- */
+  header.site{
+    position:sticky; top:0; z-index:100;
+    background:rgba(25,23,21,0.86);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line-soft);
+  }
+  nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px 32px; max-width:1180px; margin:0 auto;
+  }
+  .brand{
+    display:flex; align-items:center; gap:11px;
+    font-family:var(--display); font-weight:500; font-size:21px; letter-spacing:-0.01em;
+    color:var(--text);
+  }
+  .brand .mark{
+    width:29px; height:29px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%;
+    background:var(--accent);
+  }
+  .brand .mark svg{width:15px; height:15px;}
+  .brand .mark svg path{stroke:var(--bg);}
+  .brand .wordmark{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:20px;
+    letter-spacing:-0.01em;
+    color:var(--text);
+  }
+  .brand .wordmark .pulse{
+    color:var(--accent);
+    font-style:italic;
+  }
+
+  .nav-links{display:flex; align-items:center; gap:38px; font-size:13.5px; color:var(--text-soft);}
+  .nav-links a{position:relative; padding:4px 0; transition:color .2s ease;}
+  .nav-links a::after{
+    content:''; position:absolute; left:0; bottom:0; width:0; height:1px;
+    background:var(--accent); transition:width .25s ease;
+  }
+  .nav-links a:hover{color:var(--text);}
+  .nav-links a:hover::after{width:100%;}
+
+  .nav-cta{display:flex; align-items:center; gap:22px;}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:13.5px; font-weight:500;
+    padding:11px 22px;
+    border-radius:3px;
+    border:1px solid transparent;
+    transition:transform .18s ease, background .18s ease, color .18s ease, border-color .18s ease;
+  }
+  .btn-primary{background:var(--accent); color:#241610; font-weight:600;}
+  .btn-primary:hover{background:var(--accent-soft); transform:translateY(-1px);}
+  .btn-ghost{color:var(--text); font-weight:500; font-size:13.5px; border-bottom:1px solid transparent;}
+  .btn-ghost:hover{border-bottom-color:var(--accent); color:var(--accent);}
+  .btn[disabled]{
+    background:var(--bg-elevated); color:var(--text-mute); border-color:var(--line); cursor:not-allowed;
+  }
+  .btn[disabled]:hover{background:var(--bg-elevated); transform:none; color:var(--text-mute); border-color:var(--line);}
+  .menu-toggle{display:none;}
+
+  /* ---------- HERO ---------- */
+  .hero{position:relative; padding:110px 0 70px; overflow:hidden;}
+  .hero::before{
+    content:'';
+    position:absolute; top:-260px; right:-240px;
+    width:640px; height:640px; border-radius:50%;
+    background:radial-gradient(circle at 32% 32%, rgba(210,161,136,0.13), transparent 66%);
+    pointer-events:none;
+  }
+  .hero-grid{display:grid; grid-template-columns:1.05fr 0.95fr; gap:70px; align-items:center; position:relative;}
+  .hero h1{
+    font-family:var(--display); font-weight:500;
+    font-size:clamp(40px, 5.2vw, 64px);
+    line-height:1.06; letter-spacing:-0.015em;
+    margin:24px 0 26px; color:var(--text);
+  }
+  .hero h1 em{font-style:italic; font-weight:400; color:var(--accent);}
+  .hero p.lead{font-size:18px; color:var(--text-soft); max-width:470px; margin-bottom:38px; line-height:1.65;}
+  .hero-actions{display:flex; align-items:center; gap:22px; margin-bottom:44px;}
+  .btn-lg{padding:14px 28px; font-size:14.5px;}
+
+  .hero-metrics{display:flex; gap:40px; padding-top:30px; border-top:1px solid var(--line); max-width:520px;}
+  .metric .num{font-family:var(--display); font-size:27px; font-weight:500; color:var(--text);}
+  .metric .lbl{font-size:12px; color:var(--text-soft); margin-top:5px; letter-spacing:0.01em;}
+
+  /* ---------- BRIEF CARD (hero visual) ---------- */
+  .brief-stage{position:relative; display:flex; justify-content:center;}
+  .brief-card{
+    position:relative; width:100%; max-width:440px;
+    background:var(--card-bg);
+    border:1px solid var(--card-line);
+    border-radius:18px;
+    box-shadow:var(--card-shadow);
+    overflow:hidden;
+  }
+  .brief-card__eyebrow{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 24px 0;
+  }
+  .brief-card__eyebrow span{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:0.07em; text-transform:uppercase;
+    color:var(--card-ink-mute);
+  }
+  .brief-card__stat{
+    padding:14px 24px 20px;
+    border-bottom:1px solid var(--card-line);
+  }
+  .brief-card__stat .num{
+    font-family:var(--display); font-weight:500; font-size:44px; color:var(--card-ink);
+    letter-spacing:-0.02em; display:flex; align-items:baseline; gap:10px;
+  }
+  .brief-card__stat .num .up{
+    font-family:var(--body); font-size:13px; font-weight:600; color:#4E7C50;
+  }
+  .brief-card__stat .stat-label{font-size:12.5px; color:var(--card-ink-soft); margin-top:4px;}
+  .brief-card__bars{display:flex; align-items:flex-end; gap:5px; height:34px; margin-top:14px;}
+  .brief-card__bars span{
+    flex:1; background:var(--card-ink); opacity:0.14; border-radius:2px 2px 0 0;
+  }
+  .brief-card__bars span.now{opacity:1; background:var(--card-ink);}
+  .brief-card__head{
+    padding:20px 24px 16px;
+    border-bottom:1px solid var(--card-line);
+  }
+  .brief-card__head .case-no{
+    font-family:var(--mono); font-size:11px; letter-spacing:0.06em; color:var(--card-ink-soft); text-transform:uppercase;
+  }
+  .brief-card__head h3{
+    font-family:var(--display); font-weight:500; font-size:19px;
+    margin-top:8px; line-height:1.3; color:var(--card-ink);
+  }
+  .brief-card__body{padding:6px 24px 8px;}
+  .brief-row{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 0; border-bottom:1px solid var(--card-line);
+  }
+  .brief-row:last-child{border-bottom:none;}
+  .brief-row .label{font-size:13px; color:var(--card-ink-soft);}
+  .brief-row .value{font-family:var(--mono); font-size:13px; font-weight:500; color:var(--card-ink);}
+  .brief-row .value.muted{color:var(--card-ink-mute); font-weight:400;}
+  .pill{
+    display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:0.04em;
+    text-transform:uppercase; padding:4px 10px; border-radius:20px;
+  }
+  .pill.due{background:rgba(31,29,25,0.08); color:var(--card-ink);}
+  .pill.ok{background:rgba(78,124,80,0.14); color:#3E6640;}
+  .brief-card__foot{
+    padding:16px 24px; background:var(--card-bg-alt);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .brief-card__foot .tag{font-family:var(--mono); font-size:11px; color:var(--card-ink-soft);}
+  .avatar-stack{display:flex;}
+  .avatar-stack span{
+    width:21px; height:21px; border-radius:50%; background:var(--card-ink);
+    opacity:0.75;
+    border:2px solid var(--card-bg-alt); margin-left:-6px;
+  }
+  .avatar-stack span:first-child{margin-left:0;}
+
+  .float-tag{
+    position:absolute; background:var(--card-bg); border:1px solid var(--card-line);
+    box-shadow:0 14px 30px -16px rgba(0,0,0,0.5);
+    padding:10px 14px; border-radius:20px;
+    font-family:var(--mono); font-size:11px; display:flex; align-items:center; gap:8px;
+    color:var(--card-ink-soft);
+  }
+  .float-tag .dot{width:6px; height:6px; border-radius:50%; background:#4E7C50;}
+  .float-tag.t1{top:-4%; left:-10%;}
+  .float-tag.t2{bottom:8%; right:-12%;}
+
+  /* ---------- STRIP ---------- */
+  .strip{border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:26px 0;}
+  .strip .wrap{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:18px;}
+  .strip p{font-family:var(--mono); font-size:11.5px; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-soft);}
+  .strip-items{display:flex; gap:34px; flex-wrap:wrap;}
+  .strip-items span{font-size:13px; color:var(--text-soft); font-weight:500;}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:118px 0;}
+  .section-head{max-width:640px; margin-bottom:60px;}
+  .section-head h2{
+    font-family:var(--display); font-weight:500;
+    font-size:clamp(30px, 3.3vw, 42px); line-height:1.12;
+    margin-top:18px; letter-spacing:-0.01em; color:var(--text);
+  }
+  .section-head p{color:var(--text-soft); font-size:16px; margin-top:18px; line-height:1.65;}
+
+  /* ---------- CAPABILITIES (hairline clause list) ---------- */
+  .clause-grid{border-top:1px solid var(--line);}
+  .clause-row{
+    display:grid;
+    grid-template-columns:120px 1fr 1.4fr;
+    gap:40px;
+    padding:38px 0;
+    border-bottom:1px solid var(--line);
+    align-items:start;
+    transition:background .2s ease;
+  }
+  .clause-row:hover{background:var(--bg-dim);}
+  .clause-row .clause-mark{
+    font-family:var(--mono); font-size:13px; color:var(--accent); letter-spacing:0.02em; padding-top:4px;
+  }
+  .clause-row h3{
+    font-family:var(--display); font-weight:500; font-size:23px; letter-spacing:-0.005em; color:var(--text);
+  }
+  .clause-row p{font-size:14.5px; color:var(--text-soft); line-height:1.65; max-width:480px;}
+
+  /* ---------- QUOTE ---------- */
+  .quote-block{text-align:center; max-width:760px; margin:0 auto;}
+  .quote-block blockquote{
+    font-family:var(--display); font-style:italic; font-weight:400;
+    font-size:clamp(24px, 3vw, 32px); line-height:1.4; color:var(--text);
+  }
+  .quote-block cite{
+    display:block; margin-top:30px; font-style:normal;
+    font-family:var(--mono); font-size:12.5px; color:var(--text-soft); letter-spacing:0.02em;
+  }
+
+  /* ---------- WORKFLOW ---------- */
+  .workflow{
+    background:var(--bg-panel); color:var(--text);
+    border:1px solid var(--line);
+    border-radius:6px; padding:70px 60px; position:relative; overflow:hidden;
+  }
+  .workflow::after{
+    content:''; position:absolute; bottom:-180px; left:-160px;
+    width:460px; height:460px;
+    background:radial-gradient(circle, rgba(210,161,136,0.12), transparent 68%);
+  }
+  .workflow .section-head p{color:var(--text-soft);}
+  .workflow .clause{color:var(--accent);}
+
+  .steps{display:grid; grid-template-columns:repeat(4, 1fr); gap:30px; position:relative;}
+  .step{padding-top:22px; border-top:1px solid var(--line);}
+  .step .step-num{font-family:var(--mono); font-size:12.5px; color:var(--accent); margin-bottom:14px; display:block;}
+  .step h4{font-family:var(--display); font-size:18.5px; font-weight:500; margin-bottom:10px; color:var(--text);}
+  .step p{font-size:13.5px; color:var(--text-soft); line-height:1.6;}
+
+  /* ---------- SECURITY ---------- */
+  .split{display:grid; grid-template-columns:0.9fr 1.1fr; gap:72px; align-items:start;}
+  .split .section-head{margin-bottom:30px;}
+  .sec-badges{display:flex; flex-wrap:wrap; gap:10px; margin:24px 0 34px;}
+  .sec-badge{
+    font-family:var(--mono); font-size:11px; letter-spacing:0.02em; color:var(--text);
+    background:var(--bg-panel); border:1px solid var(--line);
+    padding:7px 13px; border-radius:20px;
+  }
+  .check-list li{
+    display:flex; gap:16px; padding:18px 0; border-bottom:1px solid var(--line); font-size:14.5px;
+  }
+  .check-list li:first-child{padding-top:0;}
+  .check-list svg{flex-shrink:0; margin-top:2px; color:var(--accent);}
+  .check-list strong{display:block; font-family:var(--body); font-weight:600; margin-bottom:4px; color:var(--text);}
+  .check-list span.desc{color:var(--text-soft); font-size:13.5px;}
+
+  .ledger{background:var(--card-bg); border:1px solid var(--card-line); border-radius:14px; box-shadow:var(--card-shadow); overflow:hidden;}
+  .ledger-head{padding:18px 24px; border-bottom:1px solid var(--card-line); display:flex; justify-content:space-between; align-items:center;}
+  .ledger-head span{font-family:var(--mono); font-size:11px; color:var(--card-ink-soft); text-transform:uppercase; letter-spacing:0.05em;}
+  .ledger-row{
+    display:grid; grid-template-columns:auto 1fr auto; gap:16px; align-items:center;
+    padding:16px 24px; border-bottom:1px solid var(--card-line); font-size:13.5px; color:var(--card-ink);
+  }
+  .ledger-row:last-child{border-bottom:none;}
+  .ledger-row .dot{width:7px; height:7px; border-radius:50%;}
+  .ledger-row .dot.green{background:#4E7C50;}
+  .ledger-row .dot.amber{background:var(--card-ink); opacity:0.4;}
+  .ledger-row .file{font-family:var(--mono); color:var(--card-ink-soft);}
+  .ledger-row .muted{color:var(--card-ink-mute);}
+
+  /* ---------- CTA ---------- */
+  .cta{
+    background:var(--accent); color:#241610;
+    border-radius:6px; padding:72px 60px;
+    display:flex; justify-content:space-between; align-items:center; gap:40px; flex-wrap:wrap;
+  }
+  .cta h2{
+    font-family:var(--display); font-weight:500;
+    font-size:clamp(26px, 3vw, 36px); max-width:460px; line-height:1.18; color:#241610;
+  }
+  .cta .btn-primary{background:#241610; color:var(--text); border-color:#241610;}
+  .cta .btn-primary:hover{background:#332017; color:var(--text);}
+  .cta .btn[disabled]{
+    background:rgba(36,22,16,0.12); color:rgba(36,22,16,0.55); border-color:rgba(36,22,16,0.3);
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer{padding:64px 0 40px; border-top:1px solid var(--line);}
+  .foot-grid{display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:40px; margin-bottom:56px;}
+  .foot-brand .brand{margin-bottom:14px;}
+  .foot-brand p{font-size:13.5px; color:var(--text-soft); max-width:280px; line-height:1.6;}
+  .foot-col h5{
+    font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:0.07em;
+    color:var(--text-mute); margin-bottom:16px;
+  }
+  .foot-col li{margin-bottom:11px;}
+  .foot-col a{font-size:13.5px; color:var(--text-soft); transition:color .2s ease;}
+  .foot-col a:hover{color:var(--accent);}
+  .foot-bottom{
+    display:flex; justify-content:space-between; align-items:center; padding-top:28px;
+    border-top:1px solid var(--line); font-size:12px; color:var(--text-mute);
+    font-family:var(--mono); flex-wrap:wrap; gap:12px;
+  }
+
+  /* ---------- REVEAL ---------- */
+  .js-ready .reveal{opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s ease;}
+  .reveal.in{opacity:1; transform:translateY(0);}
+  @media (prefers-reduced-motion: reduce){
+    .reveal{opacity:1; transform:none; transition:none;}
+    html{scroll-behavior:auto;}
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 980px){
+    .hero-grid{grid-template-columns:1fr; gap:56px;}
+    .brief-stage{order:-1;}
+    .steps{grid-template-columns:repeat(2,1fr);}
+    .split{grid-template-columns:1fr; gap:44px;}
+    .foot-grid{grid-template-columns:1fr 1fr; gap:36px;}
+    .clause-row{grid-template-columns:80px 1fr;}
+    .clause-row p{grid-column:2 / 3;}
+  }
+  @media (max-width: 680px){
+    .wrap{padding:0 20px;}
+    .nav-links{display:none;}
+    .menu-toggle{display:block; font-family:var(--mono); font-size:12px; border:1px solid var(--line); padding:8px 12px; border-radius:3px; background:none; color:var(--text);}
+    .hero{padding:60px 0 40px;}
+    .hero-metrics{flex-wrap:wrap; gap:24px;}
+    section{padding:68px 0;}
+    .steps{grid-template-columns:1fr;}
+    .workflow{padding:40px 24px;}
+    .cta{padding:44px 26px; flex-direction:column; align-items:flex-start;}
+    .foot-grid{grid-template-columns:1fr;}
+    .float-tag{display:none;}
+    .strip .wrap{flex-direction:column; align-items:flex-start;}
+    .clause-row{grid-template-columns:1fr; gap:14px;}
+    .clause-row p{grid-column:auto;}
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <nav>
+    <a href="#top" class="brand">
+      <span class="mark">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 15c2-3 3-6 4-6s2 6 3 6 1.5-9 3-9 2 9 3 9 2-4 3-4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="wordmark">Docket<span class="pulse">Pulse</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="#capabilities">Product</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#security">Security</a>
+      <a href="#firms">For Firms</a>
+    </div>
+    <div class="nav-cta">
+      <a href="https://my.docketpulse.in" class="btn-ghost">Sign in</a>
+      <button class="btn btn-primary" disabled aria-disabled="true" title="Demo booking opens soon">Request a demo</button>
+    </div>
+    <button class="menu-toggle" aria-label="Menu">MENU</button>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="clause">Legal Operations Workspace</div>
+        <h1>The docket <em>never</em><br>waits for anyone.</h1>
+        <p class="lead">DocketPulse is the Legal OS for Indian law firms — hearing dates, filings and client matters in a single daily agenda, so nothing that matters to your firm is ever discovered too late.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-lg" disabled aria-disabled="true" title="Demo booking opens soon">Request a demo</button>
+          <a href="#capabilities" class="btn-ghost">See how it works &nbsp;→</a>
+        </div>
+        <div class="hero-metrics">
+          <div class="metric">
+            <div class="num">0</div>
+            <div class="lbl">Missed hearings on&nbsp;a<br>synced docket</div>
+          </div>
+          <div class="metric">
+            <div class="num">1</div>
+            <div class="lbl">Daily agenda for<br>every fee-earner</div>
+          </div>
+          <div class="metric">
+            <div class="num">24/7</div>
+            <div class="lbl">Court diary,<br>always current</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="brief-stage">
+        <div class="float-tag t1"><span class="dot"></span> Cause list synced · 6:00 AM</div>
+        <div class="float-tag t2"><span class="dot"></span> Brief filed on time</div>
+        <div class="brief-card">
+          <div class="brief-card__eyebrow">
+            <span>Firm command center</span>
+            <span>This week</span>
+          </div>
+          <div class="brief-card__stat">
+            <div class="num">92% <span class="up">↑ 6%</span></div>
+            <div class="stat-label">Filings completed before due date</div>
+            <div class="brief-card__bars">
+              <span style="height:35%"></span>
+              <span style="height:48%"></span>
+              <span style="height:40%"></span>
+              <span style="height:60%"></span>
+              <span style="height:52%"></span>
+              <span style="height:74%"></span>
+              <span style="height:100%" class="now"></span>
+            </div>
+          </div>
+          <div class="brief-card__head">
+            <div class="case-no">OS/4471/2026 · City Civil Court</div>
+            <h3>Meera Krishnan vs.<br>Meridian Logistics Pvt. Ltd.</h3>
+          </div>
+          <div class="brief-card__body">
+            <div class="brief-row">
+              <span class="label">Next hearing</span>
+              <span class="value">21 Aug · Court 4</span>
+            </div>
+            <div class="brief-row">
+              <span class="label">Brief status</span>
+              <span class="pill due">Due today</span>
+            </div>
+            <div class="brief-row">
+              <span class="label">Assigned counsel</span>
+              <span class="value muted">Kayal Karthik</span>
+            </div>
+            <div class="brief-row">
+              <span class="label">Client review</span>
+              <span class="pill ok">Confirmed</span>
+            </div>
+          </div>
+          <div class="brief-card__foot">
+            <span class="tag">Updated 4 min ago</span>
+            <div class="avatar-stack"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STRIP -->
+  <div class="strip">
+    <div class="wrap">
+      <p>Built for the way Indian litigation actually runs</p>
+      <div class="strip-items">
+        <span>District &amp; High Courts</span>
+        <span>Cause list ingestion</span>
+        <span>Multi-advocate firms</span>
+        <span>Client-ready reporting</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAPABILITIES -->
+  <section id="capabilities">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="clause">The four case files</div>
+        <h2>Everything a matter touches, in one binder.</h2>
+        <p>DocketPulse is organised the way a firm already thinks — by matter, by client, by document, by court — not the way a database schema thinks.</p>
+      </div>
+
+      <div class="clause-grid reveal">
+        <div class="clause-row">
+          <div class="clause-mark">§ 01</div>
+          <h3>Matters</h3>
+          <p>Every case lives on one timeline — pleadings, orders, hearing history and next actions, with nothing filed away and forgotten.</p>
+        </div>
+        <div class="clause-row">
+          <div class="clause-mark">§ 02</div>
+          <h3>Clients</h3>
+          <p>A client-facing view of every matter you're running for them — so an update call takes two minutes, not a search through email.</p>
+        </div>
+        <div class="clause-row">
+          <div class="clause-mark">§ 03</div>
+          <h3>Documents</h3>
+          <p>Drafts, filed copies and court orders, version-controlled and searchable, tied to the matter and hearing they belong to.</p>
+        </div>
+        <div class="clause-row">
+          <div class="clause-mark">§ 04</div>
+          <h3>Court</h3>
+          <p>Cause lists pulled in daily and matched against your matters automatically — so a listing never surfaces first thing in a courtroom.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <section>
+    <div class="wrap quote-block reveal">
+      <blockquote>"Half of practice management is just knowing what's due, today, without having to go looking for it."</blockquote>
+      <cite>— The problem DocketPulse was built to solve</cite>
+    </div>
+  </section>
+
+  <!-- WORKFLOW -->
+  <section id="workflow">
+    <div class="wrap">
+      <div class="workflow reveal">
+        <div class="section-head">
+          <div class="clause">A day inside DocketPulse</div>
+          <h2>From cause list to closed matter, in four moves.</h2>
+          <p>The same rhythm every fee-earner in the firm follows, every single day.</p>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <span class="step-num">01</span>
+            <h4>Sync the cause list</h4>
+            <p>Court listings are pulled in each morning and matched to your open matters automatically.</p>
+          </div>
+          <div class="step">
+            <span class="step-num">02</span>
+            <h4>Read the day's docket</h4>
+            <p>One agenda per person: hearings today, filings due this week, and what's waiting on you.</p>
+          </div>
+          <div class="step">
+            <span class="step-num">03</span>
+            <h4>Prepare and file</h4>
+            <p>Drafts, briefs and prior orders live on the matter — no searching across inboxes or drives.</p>
+          </div>
+          <div class="step">
+            <span class="step-num">04</span>
+            <h4>Record the outcome</h4>
+            <p>Log what happened in court and the next date — the client view updates on its own.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECURITY -->
+  <section id="security">
+    <div class="wrap split">
+      <div class="reveal">
+        <div class="section-head">
+          <div class="clause">Security &amp; compliance, not an afterthought</div>
+          <h2>Client confidentiality isn't a feature request. It's the baseline.</h2>
+          <p>Every guardrail below is active from day one — not a roadmap item you have to ask about in a sales call.</p>
+        </div>
+        <div class="sec-badges">
+          <span class="sec-badge">DPDP Act, 2023 aligned</span>
+          <span class="sec-badge">AES-256 encryption</span>
+          <span class="sec-badge">Role-based access control</span>
+        </div>
+        <ul class="check-list">
+          <li>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 13l4 4L19 7"/></svg>
+            <div><strong>DPDP guardrails</strong><span class="desc">Client and case data is handled in line with India's Digital Personal Data Protection Act, 2023 — consent, purpose limitation and data-principal rights built in, not bolted on.</span></div>
+          </li>
+          <li>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 13l4 4L19 7"/></svg>
+            <div><strong>Role-based access control (RBAC)</strong><span class="desc">Partners, associates and clients each see exactly what their role should — nothing more, enforced at every screen and every API call.</span></div>
+          </li>
+          <li>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 13l4 4L19 7"/></svg>
+            <div><strong>Encryption at rest and in transit</strong><span class="desc">Case documents are protected with AES-256 encryption end to end, matching the confidentiality obligations you already carry.</span></div>
+          </li>
+          <li>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 13l4 4L19 7"/></svg>
+            <div><strong>Full audit trail</strong><span class="desc">Every document view, edit and filing is logged against the matter it belongs to, and available for review at any time.</span></div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="ledger reveal">
+        <div class="ledger-head">
+          <span>Access ledger — Meera Krishnan vs. Meridian</span>
+          <span>Live</span>
+        </div>
+        <div class="ledger-row">
+          <span class="dot green"></span>
+          <span class="muted">Kayal Karthik viewed hearing brief</span>
+          <span class="file">09:14</span>
+        </div>
+        <div class="ledger-row">
+          <span class="dot amber"></span>
+          <span>Draft reply filed, awaiting review</span>
+          <span class="file">Yesterday</span>
+        </div>
+        <div class="ledger-row">
+          <span class="dot green"></span>
+          <span>Client portal update sent</span>
+          <span class="file">Yesterday</span>
+        </div>
+        <div class="ledger-row">
+          <span class="dot green"></span>
+          <span>Order uploaded from Court 4</span>
+          <span class="file">Mon, 18 Aug</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="firms">
+    <div class="wrap">
+      <div class="cta reveal" id="cta">
+        <h2>Bring your next matter into DocketPulse before it goes onto a whiteboard.</h2>
+        <button class="btn btn-primary btn-lg" disabled aria-disabled="true" title="Demo booking opens soon">Request a demo →</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="#top" class="brand">
+          <span class="mark">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 15c2-3 3-6 4-6s2 6 3 6 1.5-9 3-9 2 9 3 9 2-4 3-4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="wordmark">Docket<span class="pulse">Pulse</span></span>
+        </a>
+        <p>A daily operating system for litigation teams — built around the docket, not around a database.</p>
+      </div>
+      <div class="foot-col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="#capabilities">Matters</a></li>
+          <li><a href="#capabilities">Clients</a></li>
+          <li><a href="#capabilities">Documents</a></li>
+          <li><a href="#capabilities">Court diary</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#security">Security</a></li>
+          <li><a href="#workflow">How it works</a></li>
+          <li><a href="https://my.docketpulse.in">Sign in</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 DocketPulse. All rights reserved.</span>
+      <span>Case names on this page are illustrative.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  if('IntersectionObserver' in window){
+    document.documentElement.classList.add('js-ready');
+    const revealEls = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if(e.isIntersecting){
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach(el => io.observe(el));
+  }
+  const menuToggle = document.querySelector('.menu-toggle');
+  if(menuToggle){
+    menuToggle.addEventListener('click', () => {
+      document.querySelector('#capabilities').scrollIntoView({behavior:'smooth'});
+    });
+  }
+</script>
+
+</body>
+</html>
