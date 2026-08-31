@@ -1,0 +1,7 @@
+# Public marketing site only: https://docketpulse.in/
+# The authenticated product is hosted separately at https://my.docketpulse.in/
+
+User-agent: *
+Allow: /
+
+Sitemap: https://docketpulse.in/sitemap.xm
